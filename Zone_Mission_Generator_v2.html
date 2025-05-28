@@ -1,0 +1,119 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Zone Awareness Mission Generator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #eef2f6;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      padding-top: 40px;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 600px;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    select, button {
+      padding: 10px;
+      font-size: 16px;
+      margin: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    #mission {
+      margin-top: 20px;
+      padding: 20px;
+      background: #eaf0f6;
+      border-radius: 10px;
+      font-size: 18px;
+      min-height: 120px;
+    }
+    .xp {
+      font-weight: bold;
+      margin-top: 15px;
+      font-size: 16px;
+    }
+    .milestone {
+      font-size: 18px;
+      color: #0077cc;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎯 Zone Awareness Mission Generator</h1>
+    <label for="zoneSelect">Choose your zone:</label>
+    <select id="zoneSelect">
+      <option value="any">🎲 Random</option>
+      <option value="🟢 Green Zone">🟢 Green</option>
+      <option value="🟡 Yellow Zone">🟡 Yellow</option>
+      <option value="🔴 Red Zone">🔴 Red</option>
+    </select>
+    <br>
+    <button onclick="newMission()">🎲 Get Mission</button>
+    <button onclick="completeMission()">✅ I Did It</button>
+
+    <div id="mission">Your mission will appear here.</div>
+    <div class="xp" id="xpBar">Total XP: 0</div>
+    <div class="milestone" id="milestoneMsg"></div>
+  </div>
+
+  <script>
+    const missions = [{"zone": "\ud83d\udfe2 Green Zone", "text": "Pick a cozy spot at home and do a 10-second scan of your surroundings. Where are exits, distractions, or tension points?"}, {"zone": "\ud83d\udfe2 Green Zone", "text": "Practice sitting in silence for 60 seconds. What do you hear? What do you feel in your body?"}, {"zone": "\ud83d\udfe2 Green Zone", "text": "Choose a safe place and walk through it as if you're seeing it for the first time. What do you notice that's new?"}, {"zone": "\ud83d\udfe2 Green Zone", "text": "Pick a familiar room and sit facing a different direction than usual. How does it feel? What changes in your awareness?"}, {"zone": "\ud83d\udfe2 Green Zone", "text": "Invite a friend or family member to help you point out blind spots or habits in your safe spaces."}, {"zone": "\ud83d\udfe2 Green Zone", "text": "Walk through your home with the lights off. Use your other senses to navigate. What changes in your awareness?"}, {"zone": "\ud83d\udfe1 Yellow Zone", "text": "Walk through a store or sidewalk today and avoid looking at your phone. Eyes up. Head on a swivel."}, {"zone": "\ud83d\udfe1 Yellow Zone", "text": "Enter a public space and identify 2 exits within 5 seconds. Practice quick environmental reads."}, {"zone": "\ud83d\udfe1 Yellow Zone", "text": "Without turning around, can you sense who is behind you? Check after a few seconds."}, {"zone": "\ud83d\udfe1 Yellow Zone", "text": "Practice scanning faces and posture in a public area. Who looks calm, agitated, avoidant, or alert?"}, {"zone": "\ud83d\udfe1 Yellow Zone", "text": "Stand in a line or sit in a waiting area. Practice \u2018soft eyes\u2019\u2014noticing movement without staring."}, {"zone": "\ud83d\udfe1 Yellow Zone", "text": "Pick a public space and sit with your back to a wall. Observe how it changes your alertness."}, {"zone": "\ud83d\udd34 Red Zone", "text": "Visualize a place that makes you uneasy. Identify 3 ways you'd protect or remove yourself."}, {"zone": "\ud83d\udd34 Red Zone", "text": "Stand briefly in an isolated or dim area (if safe). Observe your body\u2019s signals. What shifts?"}, {"zone": "\ud83d\udd34 Red Zone", "text": "Imagine someone confronts you verbally in a risky area. What is your first move? Mentally rehearse it."}, {"zone": "\ud83d\udd34 Red Zone", "text": "Identify the last time you ignored your instincts in a risky space. What happened? What would you do differently?"}, {"zone": "\ud83d\udd34 Red Zone", "text": "Choose a parking structure or garage. Walk with confident posture, check corners, and mentally mark exits."}, {"zone": "\ud83d\udd34 Red Zone", "text": "Role play a quick escape: where would you move if a stranger began following you right now?"}, {"zone": "\ud83d\udd34 Red Zone", "text": "Practice visualizing a \u2018Red Zone to Yellow Zone\u2019 downgrade: what action could reduce your exposure or risk?"}, {"zone": "\ud83c\udfb2 Wild Card", "text": "Practice slow, controlled breathing while walking. Can you stay centered and aware at the same time?"}, {"zone": "\ud83c\udfb2 Wild Card", "text": "Play a 2-minute awareness game: how many sounds, shapes, or colors can you spot in your surroundings?"}, {"zone": "\ud83d\udfe2 Green Zone", "text": "While brushing your teeth or doing a routine task, scan your environment for 3 things you normally ignore."}, {"zone": "\ud83d\udfe2 Green Zone", "text": "Rearrange one part of a familiar room to change your navigation pattern. Notice how it alters your movement or mood."}, {"zone": "\ud83d\udfe1 Yellow Zone", "text": "In a caf\u00e9 or store, identify which people are grouped together and who is alone. What are the visual cues?"}, {"zone": "\ud83d\udfe1 Yellow Zone", "text": "Take note of where people are standing still vs. moving. What patterns do you see in spacing or posture?"}, {"zone": "\ud83d\udd34 Red Zone", "text": "Locate a space where visibility is limited (e.g., cornered hallway or dead end). Visualize how you'd maintain awareness and mobility."}, {"zone": "\ud83d\udd34 Red Zone", "text": "Identify a place you avoid after dark. Visit during the day and map its escape options and hazards."}];
+    const xpValues = {"🟢 Green Zone": 10, "🟡 Yellow Zone": 15, "🔴 Red Zone": 20, "🎲 Wild Card": 12};
+    let currentXP = parseInt(localStorage.getItem("totalXP")) || 0;
+    let currentMission = null;
+
+    const xpBar = document.getElementById("xpBar");
+    const milestoneMsg = document.getElementById("milestoneMsg");
+
+    function updateXPBar() {
+      xpBar.innerText = "Total XP: " + currentXP;
+      if (currentXP >= 200) {
+        milestoneMsg.innerText = "🛡️ Zone Master Unlocked!";
+      } else if (currentXP >= 100) {
+        milestoneMsg.innerText = "🧭 Situational Scout Level Up!";
+      } else if (currentXP >= 50) {
+        milestoneMsg.innerText = "🧩 Beginner Awareness Badge Earned!";
+      } else {
+        milestoneMsg.innerText = "";
+      }
+    }
+
+    function newMission() {
+      const selected = document.getElementById("zoneSelect").value;
+      let filtered = missions;
+      if (selected !== "any") {
+        filtered = missions.filter(m => m.zone === selected);
+      }
+      currentMission = filtered[Math.floor(Math.random() * filtered.length)];
+      document.getElementById("mission").innerHTML = "<strong>" + currentMission.zone + "</strong><br>" + currentMission.text;
+    }
+
+    function completeMission() {
+      if (!currentMission) return alert("Get a mission first!");
+      currentXP += xpValues[currentMission.zone] || 10;
+      localStorage.setItem("totalXP", currentXP);
+      updateXPBar();
+      alert("✅ Mission complete! +" + (xpValues[currentMission.zone] || 10) + " XP earned!");
+    }
+
+    updateXPBar();
+  </script>
+</body>
+</html>
